@@ -1,0 +1,23 @@
+from typing import Dict
+from criteria import REMOTE_KEYWORDS
+
+def format_vacancy_message(vac: Dict) -> str:
+    title = vac.get('title', 'Без названия')
+    company = vac.get('company', 'Неизвестная компания')
+    city = vac.get('area', {}).get('name', 'Не указан')
+    salary = vac.get('salary')
+    salary_str = ''
+    if salary:
+        from_s = salary.get('from')
+        to_s = salary.get('to')
+        cur = salary.get('currency', 'руб')
+        if from_s and to_s:
+            salary_str = f"от {from_s} до {to_s} {cur}"
+        elif from_s:
+            salary_str = f"от {from_s} {cur}"
+        elif to_s:
+            salary_str = f"до {to_s} {cur}"
+    url = vac.get('url', '#')
+    remote_tag = "🌐 Удалённо" if any(kw in (vac.get('title','')+' '+vac.get('description','')).lower() for kw in REMOTE_KEYWORDS) else "🏢 Офис"
+    
+    return f"**{title}**\n🏢 {company}\n📍 {city}\n💰 {salary_str}\n{remote_tag}\n🔗 {url}"
